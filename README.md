@@ -1,2 +1,2 @@
 # calypso_auto_split
-auto  run calypso split mode
+A scripts that contral calypso split mode
