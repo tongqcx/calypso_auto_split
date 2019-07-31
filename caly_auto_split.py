@@ -5,8 +5,8 @@ Description:
 Usage:
     nohup python caly_auto_split.py  --jobms=JOBMS --extexec=EXTEXEC --calypath=CALYPATH
     --jobms       Defining the Job Managemant System pbs|lsf|yh|slurm
-    --extexec     Defining the external command to run optimization task such as 'mpirun -np 20 ./vasp > log'
-    --calypath    Defining the location of calypso.x
+    --extexec     Defining the external command to run optimization task, Default 'mpirun -np 20 ./vasp > log'
+    --calypath    Defining the location of calypso.x, Default './calypso.x'
 
 Author: 
     Qunchao Tong<tqc@calypso.cn>
@@ -30,13 +30,14 @@ except:
     sys.exit(0)
 
 class Autocalypso(object):
-    def __init__(self,submit = 'qsub vasp.pbs',\
-                      stat = 'qstat',\
-                      rstat = 'qstat | grep R',\
-                      delete = 'qdel',\
-                      calypath = './calypso.x',\
-                      machine = 'pbs',\
-                      extexec = 'vasp'):
+    def __init__(self,\
+                 submit = 'qsub vasp.pbs',\
+                 stat = 'qstat',\
+                 rstat = 'qstat | grep R',\
+                 delete = 'qdel',\
+                 machine = 'pbs',\
+                 calypath = './calypso.x',\
+                 extexec = 'mpirun -np 20 ./vasp > log'):
 
         self.CalyPsoPath = calypath
         self.submit = submit
@@ -113,11 +114,12 @@ class Autocalypso(object):
                 self.writeyh()
                 sys.exit(0)
         elif self.machine == 'slurm':
-            if not os.path.exists(r'./submit.sh'):
+            if not os.path.exists(r'./vasp.sh'):
                 print 'submit.sh not exit'
                 print 'A new submit.sh script has been written, and you should modify it!'
-                self.writeslurm()
+                self.writeyh()
                 sys.exit(0)
+
         if len(glob.glob(r'./POTCAR')) == 0:
             print 'POTCAR not exit'
             sys.exit(0)
@@ -160,9 +162,6 @@ class Autocalypso(object):
                 id = int(os.popen(" cd %s; %s;cd .." % (str(i+1),self.submit)).read().split('.')[0])
             elif self.machine == 'lsf':
                 id = int(os.popen(" cd %s; %s;cd .." % (str(i+1),self.submit)).read().split(' ')[1].strip('<').strip('>'))
-'''
-for slurm 
-'''
             else:
                 id = int(os.popen(" cd %s; %s;cd .." % (str(i+1),self.submit)).read().split(' ')[3])
             splitjobid.append(id)
@@ -295,7 +294,7 @@ if __name__ == '__main__':
         delete = 'yhcancel'
         a = Autocalypso(submit,stat,rstat,delete,machine = 'yh', calypath = opt.calypath, extexec = opt.extexec)
     elif opt.jobms == 'slurm':
-        submit = 'sbatch -n 12  -p normal submit.sh'
+        submit = 'sbatch -p TH_NET -N 1 -n 12 vash.sh'
         stat = 'squeue'
         rstat = 'squeue | grep   "\<R\>" '
         delete = 'scancel'
