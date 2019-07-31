@@ -160,6 +160,9 @@ class Autocalypso(object):
                 id = int(os.popen(" cd %s; %s;cd .." % (str(i+1),self.submit)).read().split('.')[0])
             elif self.machine == 'lsf':
                 id = int(os.popen(" cd %s; %s;cd .." % (str(i+1),self.submit)).read().split(' ')[1].strip('<').strip('>'))
+'''
+for slurm 
+'''
             else:
                 id = int(os.popen(" cd %s; %s;cd .." % (str(i+1),self.submit)).read().split(' ')[3])
             splitjobid.append(id)
