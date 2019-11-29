@@ -282,7 +282,7 @@ if __name__ == '__main__':
     if opt.jobms == 'pbs':
         a = Autocalypso(calypath = opt.calypath, extexec = opt.extexec)
     elif opt.jobms == 'lsf':
-        submit = 'bsub run.lsf'
+        submit = 'bsub < run.lsf'
         stat = 'bjobs'
         rstat = 'bjobs | grep RUN'
         delete = 'bkill'
